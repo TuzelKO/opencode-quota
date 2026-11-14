@@ -474,7 +474,7 @@ export default Plugin.define({
         },
         order: 55,
         kind: "menu",
-        icon: "status",
+        icon: "window-analytics",
       },
       list: (input) => (input.open.includes("limits") ? [tab] : []),
       render: (props) => <Limits session={props.session} screen={props.screen} />,
