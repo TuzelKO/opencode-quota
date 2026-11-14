@@ -286,7 +286,8 @@ export default {
       const stamp = () => {
         const values = Object.values(reports()).map((item) => item.fetchedAt)
         if (values.length === 0) return ""
-        return `updated ${left(now() - Math.min(...values))} ago`
+        const age = now() - Math.min(...values)
+        return age < 5_000 ? "updated just now" : `updated ${left(age)} ago`
       }
       return h(
         "box",
