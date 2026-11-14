@@ -211,7 +211,7 @@ export default {
       })
     }
 
-    const WindowLine = (props: { window: Window }) => {
+    const WindowLine = (props: { window: Window; width: () => number }) => {
       const used = () =>
         props.window.used !== undefined && props.window.limit !== undefined
           ? `${compact(props.window.used)}/${compact(props.window.limit)}`
@@ -225,15 +225,17 @@ export default {
           wrapMode: "none",
           get children() {
             const reset = props.window.resetsAt ? left(props.window.resetsAt - now()) : ""
-            return `  ${pad(LABELS[props.window.id] ?? props.window.id, 5)} ${bar(props.window.percent)} ${percentText(
+            const barWidth = Math.max(6, props.width() - 40)
+            return `  ${pad(LABELS[props.window.id] ?? props.window.id, 5)} ${bar(
               props.window.percent,
-            ).padStart(4)}  ${pad(used(), 12)} ${reset}`
+              barWidth,
+            )} ${percentText(props.window.percent).padStart(4)}  ${pad(used(), 12)} ${reset}`
           },
         },
       )
     }
 
-    const ProviderBlock = (props: { providerID: string }) => {
+    const ProviderBlock = (props: { providerID: string; width: () => number }) => {
       const windows = () => windowsFor(props.providerID)
       const small = () => smallest(windows())
       const current = () => context.ui.model.current()?.providerID === props.providerID
@@ -249,16 +251,17 @@ export default {
             },
             wrapMode: "none",
             get children() {
-              return `${current() ? "●" : "○"} ${pad(NAMES[props.providerID] ?? props.providerID, 26)} ${percentText(
-                small()?.percent,
-              )}`
+              const name = `${current() ? "●" : "○"} ${NAMES[props.providerID] ?? props.providerID}`
+              const pct = percentText(small()?.percent)
+              const space = Math.max(1, props.width() - name.length - pct.length - 3)
+              return name + " ".repeat(space) + pct
             },
           },
         ),
         h(
           For,
           { get each() { return windows() } },
-          (item: Window) => h(WindowLine, { window: item }, item.id),
+          (item: Window) => h(WindowLine, { window: item, width: props.width }),
         ),
         h(
           Show,
@@ -279,7 +282,7 @@ export default {
       )
     }
 
-    const Panel = () => {
+    const Panel = (props: { width: () => number }) => {
       const stamp = () => {
         const values = Object.values(reports()).map((item) => item.fetchedAt)
         if (values.length === 0) return ""
@@ -287,7 +290,7 @@ export default {
       }
       return h(
         "box",
-        { flexDirection: "column", padding: 1, flexGrow: 1 },
+        { flexDirection: "column", padding: 1, flexGrow: 1, width: "100%" },
         h(
           "text",
           {
@@ -303,7 +306,7 @@ export default {
         h(
           For,
           { get each() { return providerOrder() } },
-          (providerID: string) => h(ProviderBlock, { providerID }),
+          (providerID: string) => h(ProviderBlock, { providerID, width: props.width }),
         ),
         h(
           "text",
@@ -350,8 +353,16 @@ export default {
     context.ui.slot({ append: "prompt.footer.status", render: () => h(Badge) })
     context.ui.slot({
       append: "session.panel",
-      render: (panel: { name: string }) =>
-        h(Show, { get when() { return panel.name === "quota" } }, h(Panel)),
+      render: (panel: { name: string; width: number }) =>
+        h(
+          Show,
+          { get when() { return panel.name === "quota" } },
+          h(Panel, {
+            get width() {
+              return panel.width
+            },
+          }),
+        ),
     })
 
     context.keymap.layer(() => ({
@@ -363,8 +374,9 @@ export default {
           description: "Provider spend windows",
           group: "Quota",
           palette: true,
-          slash: { name: "quota" },
-          run: () => {
+          slash: { name: "quota", arguments: true },
+          run: (input?: string) => {
+            if (input?.trim() === "refresh") refresh(true)
             if (!context.ui.panel.open("quota"))
               context.ui.toast.show({ message: "Open a session to show quota", variant: "warning" })
           },
