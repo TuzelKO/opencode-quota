@@ -31,7 +31,8 @@ the context indicator and opens the full picture in a side tab.
 - ⏳ **Per-provider progress** — each provider's ring spins while its own request is in
   flight, so a slow provider is visible without blocking the others.
 - 💻 **Terminal UI** — a footer badge next to the context meter, a `/quota` panel with the
-  same windows, and a toast when a window crosses 70% or 90%.
+  same windows (run `/quota` again to close it), and a toast when a window crosses 70% or
+  90%.
 - 🌍 **Localized** — English, Russian, German, French, Chinese (the desktop UI; the
   terminal UI has no locale API and stays in English).
 - 🧹 **Only what you connected** — a provider without a connection never appears; one that

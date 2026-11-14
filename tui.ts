@@ -301,7 +301,7 @@ export default {
             wrapMode: "none",
             get children() {
               const title = refreshing() ? "Quota · refreshing…" : `Quota · ${stamp()}`
-              const hint = "/quota refresh"
+              const hint = "/quota close"
               const space = Math.max(1, props.width - title.length - hint.length - 2)
               return title + " ".repeat(space) + hint
             },
@@ -382,7 +382,16 @@ export default {
           palette: true,
           slash: { name: "quota", arguments: true },
           run: (input?: string) => {
-            if (input?.trim() === "refresh") refresh(true)
+            const action = input?.trim()
+            if (action === "refresh") {
+              refresh(true)
+              context.ui.panel.open("quota")
+              return
+            }
+            if (action === "close" || context.ui.panel.current()?.name === "quota") {
+              context.ui.panel.close()
+              return
+            }
             if (!context.ui.panel.open("quota"))
               context.ui.toast.show({ message: "Open a session to show quota", variant: "warning" })
           },
@@ -393,6 +402,13 @@ export default {
           group: "Quota",
           palette: true,
           run: () => refresh(true),
+        },
+        {
+          id: "quota.close",
+          title: "Close quota",
+          group: "Quota",
+          palette: true,
+          run: () => context.ui.panel.close(),
         },
       ],
     }))
