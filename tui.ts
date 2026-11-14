@@ -299,7 +299,10 @@ export default {
             },
             wrapMode: "none",
             get children() {
-              return refreshing() ? "Quota · refreshing…" : `Quota · ${stamp()}`
+              const title = refreshing() ? "Quota · refreshing…" : `Quota · ${stamp()}`
+              const hint = "/quota refresh"
+              const space = Math.max(1, props.width - title.length - hint.length - 2)
+              return title + " ".repeat(space) + hint
             },
           },
         ),
@@ -309,16 +312,18 @@ export default {
           (providerID: string) => h(ProviderBlock, { providerID, get width() { return props.width } }),
         ),
         h(
-          "text",
-          {
-            get fg() {
-              return muted()
+          Show,
+          { get when() { return providerOrder().length === 0 } },
+          h(
+            "text",
+            {
+              get fg() {
+                return muted()
+              },
+              wrapMode: "none",
             },
-            wrapMode: "none",
-            get children() {
-              return providerOrder().length === 0 ? "No connected providers report quota." : "/quota refresh"
-            },
-          },
+            "No connected providers report quota.",
+          ),
         ),
       )
     }
