@@ -1,0 +1,57 @@
+{
+  "name": "@tuzelko/opencode-quota",
+  "version": "0.1.0",
+  "description": "Spend windows of the connected providers, as a ring in the session header and a side panel.",
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "quota",
+    "usage",
+    "limits",
+    "desktop"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./rpc": "./rpc.ts",
+    "./gui-experimental": "./gui-experimental.cjs"
+  },
+  "files": [
+    "index.ts",
+    "probe.ts",
+    "rpc.ts",
+    "gui-experimental.cjs",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "check": "tsc --noEmit",
+    "prepare": "npm run build",
+    "prepack": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TuzelKO/opencode-quota.git"
+  },
+  "homepage": "https://github.com/TuzelKO/opencode-quota#readme",
+  "bugs": {
+    "url": "https://github.com/TuzelKO/opencode-quota/issues"
+  },
+  "dependencies": {
+    "@opencode/plugin": "2.2.5"
+  },
+  "devDependencies": {
+    "solid-js": "^1.9.18",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.5",
+    "vite-plugin-solid": "^2.11.15"
+  },
+  "peerDependencies": {
+    "solid-js": ">=1.9.0"
+  }
+}
