@@ -66,6 +66,28 @@ Requires OpenCode V2. The desktop app gets the ring and the side panel; the term
 gets the footer badge and `/quota` from the same plugin entry — the TUI loads the `./tui`
 part of the plugins its server already loads.
 
+## 💻 Terminal UI
+
+The footer badge sits next to the context meter and follows the model you run:
+
+```text
+Z.AI 43%   12.6K (1%)   ctrl+p commands
+```
+
+| Action | How |
+| --- | --- |
+| Open the panel | `/quota` |
+| Close it | `/quota` again, or `/quota close` |
+| Force a refresh | `/quota refresh` |
+| Refresh or close from the palette | `ctrl+p` → "Refresh quota" / "Close quota" |
+
+The panel lists every connected provider, the current one first, with a bar per window,
+the absolute usage and the reset countdown. The header shows when the providers last
+answered and the `/quota close` hint. A window crossing 70% or 90% raises a toast.
+
+The terminal UI has no locale API, so its strings stay in English; the desktop UI is
+localized.
+
 ## ⚙️ How it works
 
 - **OpenCode Go** comes from the app's own usage store — the numbers behind the Console,
