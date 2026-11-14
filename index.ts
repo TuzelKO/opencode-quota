@@ -10,7 +10,7 @@ type Report = {
   fetchedAt: number
 }
 
-const TTL = 60_000
+const TTL = 300_000
 
 const cache = new Map<string, Report>()
 

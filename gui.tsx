@@ -275,10 +275,13 @@ export default Plugin.define({
 
     const load = (force = false) => {
       for (const providerID of REMOTE) void loadSource(providerID, force)
+      const session = ctx.sessions.current()
+      const location = session?.location
+      if (location) void session.server.data.location.usage.sync(location).catch(() => {})
     }
 
     void load()
-    const timer = setInterval(() => load(), 60_000)
+    const timer = setInterval(() => load(), 300_000)
     const tick = setInterval(() => setNow(Date.now()), 30_000)
 
     const synced = new Set<string>()

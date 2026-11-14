@@ -187,7 +187,7 @@ export default {
     }
 
     void refresh()
-    const slow = setInterval(() => refresh(), 60_000)
+    const slow = setInterval(() => refresh(), 300_000)
     const clock = setInterval(() => setNow(Date.now()), 30_000)
     const spin = setInterval(() => {
       if (refreshing()) setFrame((value) => (value + 1) % SPINNER.length)
