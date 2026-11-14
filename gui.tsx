@@ -1,6 +1,6 @@
 import { createMemo, createSignal, For, Show } from "solid-js"
 import type { MountedSession, PanelTab, SessionScreen } from "@opencode/plugin/gui"
-import { createKeyed, MenuItem, Panel, Plugin, Slot, Style } from "@opencode/plugin/gui"
+import { createKeyed, ComposerPill, MenuItem, Panel, Plugin, Slot, Style } from "@opencode/plugin/gui"
 import { Quota } from "./rpc"
 
 type Window = {
@@ -44,6 +44,14 @@ const FALLBACK: Record<string, string> = {
   "zhipuai-coding-plan": "Zhipu AI Coding Plan",
   "kimi-code-plan-global": "Kimi Code",
   "kimi-code-plan-cn": "Kimi Code (CN)",
+}
+
+const SHORT: Record<string, string> = {
+  "opencode-go": "Go",
+  "zai-coding-plan": "Z.AI",
+  "zhipuai-coding-plan": "Zhipu",
+  "kimi-code-plan-global": "Kimi",
+  "kimi-code-plan-cn": "Kimi CN",
 }
 
 const WINDOW_ORDER = ["5h", "week", "month"]
@@ -526,6 +534,34 @@ export default Plugin.define({
         if (session) ctx.layout.open(`${ctx.id}:limits`, session, { tab: "select", background: true })
       },
     }))
+
+    ctx.add(ComposerPill, {
+      id: "quota",
+      show: (input) => {
+        if (!ctx.layout.narrow()) return undefined
+        const provider = input.screen.composer.model()?.providerID
+        if (!provider) return undefined
+        const small = smallest(input.session, provider)
+        const tone = toneOf(small?.percent)
+        return {
+          label: `${SHORT[provider] ?? nameOf(input.session, provider)} ${percentText(small?.percent)}`,
+          icon: "status",
+          tone: tone === "normal" ? undefined : tone,
+          title: ctx.t("menu.title"),
+          rows: windowsFor(input.session, provider).map((item) => {
+            const rowTone = toneOf(item.percent)
+            return {
+              id: item.id,
+              label: ctx.t(WINDOW_KEY[item.id] ?? "window.5h"),
+              detail: `${percentText(item.percent)}${
+                item.resetsAt ? ` · ${formatLeft(item.resetsAt - Date.now())}` : ""
+              }`,
+              tone: rowTone === "normal" ? undefined : rowTone,
+            }
+          }),
+        }
+      },
+    })
 
     ctx.add(Style, css)
 

@@ -22,6 +22,8 @@ the context indicator and opens the full picture in a side tab.
 
 - 💍 **Ring in the session header** — the used share of the smallest window of the current
   model's provider. Click it to open the panel.
+- 📱 **Narrow screens** — on a phone-sized window the same reading appears as a pill
+  above the composer, with every window and reset in its menu.
 - 🗂️ **Panel tab, not a dialog** — every connected provider collapses into an accordion,
   with the current provider expanded; opening another closes the previous one.
 - 📈 **Every window, not just one** — percent, absolute usage and the reset countdown for
