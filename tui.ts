@@ -230,7 +230,6 @@ export default {
             ).padStart(4)}  ${pad(used(), 12)} ${reset}`
           },
         },
-        "",
       )
     }
 
@@ -255,7 +254,6 @@ export default {
               )}`
             },
           },
-          "",
         ),
         h(
           For,
@@ -276,7 +274,6 @@ export default {
                 return `  ${report()?.error}`
               },
             },
-            "",
           ),
         ),
       )
@@ -302,12 +299,11 @@ export default {
               return refreshing() ? "Quota · refreshing…" : `Quota · ${stamp()}`
             },
           },
-          "",
         ),
         h(
           For,
           { get each() { return providerOrder() } },
-          (providerID: string) => h(ProviderBlock, { providerID }, providerID),
+          (providerID: string) => h(ProviderBlock, { providerID }),
         ),
         h(
           "text",
@@ -320,7 +316,6 @@ export default {
               return providerOrder().length === 0 ? "No connected providers report quota." : "/quota refresh"
             },
           },
-          "",
         ),
       )
     }
@@ -349,15 +344,14 @@ export default {
             return `${SHORT[id] ?? id} ${percentText(small()?.percent)}`
           },
         },
-        "",
       )
     }
 
-    context.ui.slot({ append: "prompt.footer.status", render: () => h(Badge, {}, "badge") })
+    context.ui.slot({ append: "prompt.footer.status", render: () => h(Badge) })
     context.ui.slot({
       append: "session.panel",
       render: (panel: { name: string }) =>
-        h(Show, { get when() { return panel.name === "quota" } }, h(Panel, {}, "quota")),
+        h(Show, { get when() { return panel.name === "quota" } }, h(Panel)),
     })
 
     context.keymap.layer(() => ({
