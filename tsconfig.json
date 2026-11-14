@@ -9,5 +9,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["index.ts", "probe.ts", "rpc.ts", "gui.tsx"]
+  "include": ["index.ts", "probe.ts", "rpc.ts", "gui.tsx", "tui.ts", "virtual.d.ts"]
 }

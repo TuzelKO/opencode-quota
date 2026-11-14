@@ -1,6 +1,6 @@
 {
   "name": "@tuzelko/opencode-quota",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Spend windows of the connected providers, as a ring in the session header and a side panel.",
   "keywords": [
     "opencode",
@@ -18,12 +18,14 @@
   "exports": {
     ".": "./index.ts",
     "./rpc": "./rpc.ts",
+    "./tui": "./tui.ts",
     "./gui-experimental": "./gui-experimental.cjs"
   },
   "files": [
     "index.ts",
     "probe.ts",
     "rpc.ts",
+    "tui.ts",
     "gui-experimental.cjs",
     "README.md",
     "LICENSE"
