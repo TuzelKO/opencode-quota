@@ -211,7 +211,7 @@ export default {
       })
     }
 
-    const WindowLine = (props: { window: Window; width: () => number }) => {
+    const WindowLine = (props: { window: Window; width: number }) => {
       const used = () =>
         props.window.used !== undefined && props.window.limit !== undefined
           ? `${compact(props.window.used)}/${compact(props.window.limit)}`
@@ -225,7 +225,7 @@ export default {
           wrapMode: "none",
           get children() {
             const reset = props.window.resetsAt ? left(props.window.resetsAt - now()) : ""
-            const barWidth = Math.max(6, props.width() - 40)
+            const barWidth = Math.max(6, props.width - 40)
             return `  ${pad(LABELS[props.window.id] ?? props.window.id, 5)} ${bar(
               props.window.percent,
               barWidth,
@@ -235,7 +235,7 @@ export default {
       )
     }
 
-    const ProviderBlock = (props: { providerID: string; width: () => number }) => {
+    const ProviderBlock = (props: { providerID: string; width: number }) => {
       const windows = () => windowsFor(props.providerID)
       const small = () => smallest(windows())
       const current = () => context.ui.model.current()?.providerID === props.providerID
@@ -253,7 +253,7 @@ export default {
             get children() {
               const name = `${current() ? "●" : "○"} ${NAMES[props.providerID] ?? props.providerID}`
               const pct = percentText(small()?.percent)
-              const space = Math.max(1, props.width() - name.length - pct.length - 3)
+              const space = Math.max(1, props.width - name.length - pct.length - 3)
               return name + " ".repeat(space) + pct
             },
           },
@@ -261,7 +261,7 @@ export default {
         h(
           For,
           { get each() { return windows() } },
-          (item: Window) => h(WindowLine, { window: item, width: props.width }),
+          (item: Window) => h(WindowLine, { window: item, get width() { return props.width } }),
         ),
         h(
           Show,
@@ -282,7 +282,7 @@ export default {
       )
     }
 
-    const Panel = (props: { width: () => number }) => {
+    const Panel = (props: { width: number }) => {
       const stamp = () => {
         const values = Object.values(reports()).map((item) => item.fetchedAt)
         if (values.length === 0) return ""
@@ -306,7 +306,7 @@ export default {
         h(
           For,
           { get each() { return providerOrder() } },
-          (providerID: string) => h(ProviderBlock, { providerID, width: props.width }),
+          (providerID: string) => h(ProviderBlock, { providerID, get width() { return props.width } }),
         ),
         h(
           "text",
