@@ -8,7 +8,7 @@ export type Window = {
   limited?: boolean
 }
 
-export type Probe = (key: string) => Promise<{ windows: Window[]; plan?: string }>
+export type Probe = (key: string) => Promise<{ windows: Window[]; plan?: string; error?: string }>
 
 const TIMEOUT = 10_000
 
@@ -62,47 +62,79 @@ export const zaiProbe = (host: string): Probe => async (key) => {
 }
 
 // Step Plan answers the current cycle in one snapshot: the older coding plans
-// carry rolling 5-hour and weekly windows, the credit plans a monthly pool.
-// Every percentage is already the used share, unlike the console's remaining
-// rates. The China and global platforms are separate hosts with separate keys.
+// carry rolling 5-hour and weekly windows, the credit plans a monthly pool and
+// top-up packs. Every percentage is already the used share, unlike the
+// console's remaining rates.
 export const stepfunProbe = (host: string): Probe => async (key) => {
   const body = (await json(`${host}/step_plan/v1/usage`, key)) as {
-    plan?: { name?: unknown }
-    quota?: { windows?: unknown; credit_buckets?: unknown }
+    plan?: { name?: unknown; state?: unknown }
+    quota?: {
+      allowed?: unknown
+      reason?: unknown
+      state?: unknown
+      windows?: unknown
+      credit_buckets?: unknown
+    }
   }
   const windows: Window[] = []
+  const share = (value: number) => Math.min(100, Math.max(0, round(value)))
 
-  const count = (value: unknown): number | undefined =>
-    num(typeof value === "string" ? Number(value) : value)
+  const credits = (value: unknown): number | undefined => {
+    if (typeof value !== "string" || !/^\d+$/.test(value)) return undefined
+    const amount = Number(value)
+    return Number.isSafeInteger(amount) ? amount : undefined
+  }
+
+  const push = (window: Window) => {
+    if (windows.some((item) => item.id === window.id)) return
+    windows.push(window)
+  }
 
   const limits = Array.isArray(body?.quota?.windows) ? body.quota.windows : []
   for (const raw of limits) {
+    if (!raw || typeof raw !== "object") continue
     const item = raw as Record<string, unknown>
     const id = item.id === "five_hour" ? "5h" : item.id === "weekly" ? "week" : undefined
     const percent = num(item.used_percent)
-    if (!id || percent === undefined || item.limited === false) continue
-    windows.push({ id, percent: round(percent), resetsAt: num(item.resets_at_ms) })
+    if (!id || percent === undefined) continue
+    push({ id, percent: share(percent), resetsAt: num(item.resets_at_ms) })
   }
 
   const buckets = Array.isArray(body?.quota?.credit_buckets) ? body.quota.credit_buckets : []
   for (const raw of buckets) {
+    if (!raw || typeof raw !== "object") continue
     const item = raw as Record<string, unknown>
-    if (item.type !== "subscription") continue
+    const id = item.type === "subscription" ? "month" : item.type === "topup" ? "topup" : undefined
     const percent = num(item.used_percent)
-    if (percent === undefined) continue
-    const limit = count(item.total)
-    const remaining = count(item.remaining)
-    windows.push({
-      id: "month",
-      percent: round(percent),
+    if (!id || percent === undefined) continue
+    const limit = credits(item.total)
+    const remaining = credits(item.remaining)
+    push({
+      id,
+      percent: share(percent),
+      // A credit bucket names the end of its cycle in expires_at_ms; resets_at_ms
+      // is null for buckets that do not reset.
       resetsAt: num(item.resets_at_ms) ?? num(item.expires_at_ms),
-      used: limit !== undefined && remaining !== undefined ? limit - remaining : undefined,
+      used:
+        limit !== undefined && remaining !== undefined && limit > 0 && remaining <= limit
+          ? limit - remaining
+          : undefined,
       limit,
       unit: "credits",
     })
   }
 
-  return { windows, plan: text(body?.plan?.name) }
+  const quota = body?.quota
+  const error =
+    quota?.allowed === false
+      ? text(quota.reason) ?? "quota exhausted"
+      : quota?.state === "partial"
+        ? "quota data is partial"
+        : body?.plan?.state === "unavailable"
+          ? "no active plan"
+          : undefined
+
+  return { windows, plan: text(body?.plan?.name), error }
 }
 
 // Kimi Code publishes the used share per pool (`limit_5h`, `limit_7d`,

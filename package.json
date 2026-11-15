@@ -1,6 +1,6 @@
 {
   "name": "@tuzelko/opencode-quota",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Spend windows of the connected providers, as a ring in the session header and a side panel.",
   "keywords": [
     "opencode",

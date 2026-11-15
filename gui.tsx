@@ -52,12 +52,13 @@ const FALLBACK: Record<string, string> = {
   "stepfun-step-plan": "StepFun Step Plan (CN)",
 }
 
-const WINDOW_ORDER = ["5h", "week", "month"]
+const WINDOW_ORDER = ["5h", "week", "month", "topup"]
 
 const WINDOW_KEY: Record<string, string> = {
   "5h": "window.5h",
   week: "window.week",
   month: "window.month",
+  topup: "window.topup",
 }
 
 const css = `
@@ -158,6 +159,7 @@ export default Plugin.define({
       "window.5h": "5 hours",
       "window.week": "Week",
       "window.month": "Month",
+      "window.topup": "Top-up",
       "window.used": "{{used}} of {{limit}}",
       "left.days": "{{days}}d {{hours}}h",
       "left.hours": "{{hours}}h {{minutes}}m",
@@ -179,6 +181,7 @@ export default Plugin.define({
       "window.5h": "5 часов",
       "window.week": "Неделя",
       "window.month": "Месяц",
+      "window.topup": "Пополнение",
       "window.used": "{{used}} из {{limit}}",
       "left.days": "{{days}} д {{hours}} ч",
       "left.hours": "{{hours}} ч {{minutes}} мин",
@@ -200,6 +203,7 @@ export default Plugin.define({
       "window.5h": "5 Stunden",
       "window.week": "Woche",
       "window.month": "Monat",
+      "window.topup": "Aufladung",
       "window.used": "{{used}} von {{limit}}",
       "left.days": "{{days}} T {{hours}} Std.",
       "left.hours": "{{hours}} Std. {{minutes}} Min.",
@@ -221,6 +225,7 @@ export default Plugin.define({
       "window.5h": "5 heures",
       "window.week": "Semaine",
       "window.month": "Mois",
+      "window.topup": "Recharge",
       "window.used": "{{used}} sur {{limit}}",
       "left.days": "{{days}} j {{hours}} h",
       "left.hours": "{{hours}} h {{minutes}} min",
@@ -242,6 +247,7 @@ export default Plugin.define({
       "window.5h": "5 小时",
       "window.week": "每周",
       "window.month": "每月",
+      "window.topup": "加油包",
       "window.used": "{{used}} / {{limit}}",
       "left.days": "{{days}} 天 {{hours}} 小时",
       "left.hours": "{{hours}} 小时 {{minutes}} 分钟",
@@ -352,6 +358,10 @@ export default Plugin.define({
 
     const WindowRow = (props: { window: Window }) => {
       const color = () => toneColor(props.window.percent) ?? "var(--v2-text-text-muted)"
+      const label = () => {
+        const key = WINDOW_KEY[props.window.id]
+        return key ? ctx.t(key) : props.window.id
+      }
       const used = () =>
         props.window.used !== undefined && props.window.limit !== undefined
           ? ctx.t("window.used", { used: compact.format(props.window.used), limit: compact.format(props.window.limit) })
@@ -359,7 +369,7 @@ export default Plugin.define({
       return (
         <div class="q-window">
           <div class="q-window-top">
-            <span class="q-window-name">{ctx.t(WINDOW_KEY[props.window.id] ?? "window.5h")}</span>
+            <span class="q-window-name">{label()}</span>
             <span class="q-window-pct" style={{ color: color() }}>
               {percentText(props.window.percent)}
             </span>

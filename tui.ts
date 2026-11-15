@@ -39,7 +39,7 @@ const REMOTE = [
   "stepfun-step-plan",
 ]
 const KNOWN = [GO, ...REMOTE]
-const ORDER = ["5h", "week", "month"]
+const ORDER = ["5h", "week", "month", "topup"]
 
 const NAMES: Record<string, string> = {
   "opencode-go": "OpenCode Go",
@@ -61,7 +61,7 @@ const SHORT: Record<string, string> = {
   "stepfun-step-plan": "StepFun CN",
 }
 
-const LABELS: Record<string, string> = { "5h": "5h", week: "Week", month: "Month" }
+const LABELS: Record<string, string> = { "5h": "5h", week: "Week", month: "Month", topup: "Top-up" }
 
 const WARN_AT = 70
 const DANGER_AT = 90
@@ -214,7 +214,7 @@ export default {
 
     const providerOrder = () => {
       const current = context.ui.model.current()?.providerID
-      const available = KNOWN.filter((id) => id === current || windowsFor(id).length > 0)
+      const available = KNOWN.filter((id) => id === current || reports()[id] !== undefined)
       return [...available].sort((leftID, rightID) => {
         if (leftID === current) return -1
         if (rightID === current) return 1
@@ -237,7 +237,7 @@ export default {
           get children() {
             const reset = props.window.resetsAt ? left(props.window.resetsAt - now()) : ""
             const barWidth = Math.max(6, props.width - 40)
-            return `  ${pad(LABELS[props.window.id] ?? props.window.id, 5)} ${bar(
+            return `  ${pad(LABELS[props.window.id] ?? props.window.id, 6)} ${bar(
               props.window.percent,
               barWidth,
             )} ${percentText(props.window.percent).padStart(4)}  ${pad(used(), 12)} ${reset}`
