@@ -1,5 +1,5 @@
 import { Plugin } from "@opencode/plugin"
-import { kimiProbe, zaiProbe, type Probe, type Window } from "./probe"
+import { kimiProbe, stepfunProbe, zaiProbe, type Probe, type Window } from "./probe"
 import { Quota } from "./rpc"
 
 type Report = {
@@ -39,6 +39,8 @@ const sources: { integrationID: string; probe: Probe }[] = [
     probe: kimiProbe(["https://api.kimi.ai/coding/v1/usages", "https://api.kimi.com/coding/v1/usages"]),
   },
   { integrationID: "kimi-code-plan-cn", probe: kimiProbe(["https://api.kimi.com/coding/v1/usages"]) },
+  { integrationID: "stepfun-ai-step-plan", probe: stepfunProbe("https://api.stepfun.ai") },
+  { integrationID: "stepfun-step-plan", probe: stepfunProbe("https://api.stepfun.com") },
 ]
 
 type Connection = { type?: string; name?: string }

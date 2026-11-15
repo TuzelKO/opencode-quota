@@ -49,6 +49,8 @@ the context indicator and opens the full picture in a side tab.
 | Zhipu AI Coding Plan (CN) | the same payload on the China platform |
 | Kimi For Coding (global) | 5-hour and monthly pools |
 | Kimi For Coding (CN) | the same on the China host |
+| StepFun Step Plan (global) | monthly Credit pool, or 5-hour and weekly windows on the older coding plans |
+| StepFun Step Plan (CN) | the same on the China host |
 
 The ring follows the model you run; the panel lists every connected provider.
 
@@ -94,8 +96,8 @@ localized.
 
 - **OpenCode Go** comes from the app's own usage store — the numbers behind the Console,
   one shared allowance across models.
-- **Z.AI and Kimi** are queried by the server part with the key OpenCode already stores in
-  the integration. Answers are cached for a minute.
+- **Z.AI, Kimi and StepFun** are queried by the server part with the key OpenCode already
+  stores in the integration. Answers are cached for five minutes.
 - A provider with no connection is skipped entirely. A connected provider that fails keeps
   its last numbers and shows the error instead of disappearing.
 - The desktop GUI plugin API is experimental; the plugin uses only documented surfaces.

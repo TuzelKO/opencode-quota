@@ -61,6 +61,50 @@ export const zaiProbe = (host: string): Probe => async (key) => {
   return { windows, plan: text(body?.data?.level) }
 }
 
+// Step Plan answers the current cycle in one snapshot: the older coding plans
+// carry rolling 5-hour and weekly windows, the credit plans a monthly pool.
+// Every percentage is already the used share, unlike the console's remaining
+// rates. The China and global platforms are separate hosts with separate keys.
+export const stepfunProbe = (host: string): Probe => async (key) => {
+  const body = (await json(`${host}/step_plan/v1/usage`, key)) as {
+    plan?: { name?: unknown }
+    quota?: { windows?: unknown; credit_buckets?: unknown }
+  }
+  const windows: Window[] = []
+
+  const count = (value: unknown): number | undefined =>
+    num(typeof value === "string" ? Number(value) : value)
+
+  const limits = Array.isArray(body?.quota?.windows) ? body.quota.windows : []
+  for (const raw of limits) {
+    const item = raw as Record<string, unknown>
+    const id = item.id === "five_hour" ? "5h" : item.id === "weekly" ? "week" : undefined
+    const percent = num(item.used_percent)
+    if (!id || percent === undefined || item.limited === false) continue
+    windows.push({ id, percent: round(percent), resetsAt: num(item.resets_at_ms) })
+  }
+
+  const buckets = Array.isArray(body?.quota?.credit_buckets) ? body.quota.credit_buckets : []
+  for (const raw of buckets) {
+    const item = raw as Record<string, unknown>
+    if (item.type !== "subscription") continue
+    const percent = num(item.used_percent)
+    if (percent === undefined) continue
+    const limit = count(item.total)
+    const remaining = count(item.remaining)
+    windows.push({
+      id: "month",
+      percent: round(percent),
+      resetsAt: num(item.resets_at_ms) ?? num(item.expires_at_ms),
+      used: limit !== undefined && remaining !== undefined ? limit - remaining : undefined,
+      limit,
+      unit: "credits",
+    })
+  }
+
+  return { windows, plan: text(body?.plan?.name) }
+}
+
 // Kimi Code publishes the used share per pool (`limit_5h`, `limit_7d`,
 // `limit_month_total`) next to the request-count windows. Each regional plan
 // has its own host; the same key answers on both, so the global one tries both.

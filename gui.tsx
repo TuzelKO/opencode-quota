@@ -29,6 +29,8 @@ const KNOWN = [
   "zhipuai-coding-plan",
   "kimi-code-plan-global",
   "kimi-code-plan-cn",
+  "stepfun-ai-step-plan",
+  "stepfun-step-plan",
 ] as const
 
 const REMOTE = [
@@ -36,6 +38,8 @@ const REMOTE = [
   "zhipuai-coding-plan",
   "kimi-code-plan-global",
   "kimi-code-plan-cn",
+  "stepfun-ai-step-plan",
+  "stepfun-step-plan",
 ] as const
 
 const FALLBACK: Record<string, string> = {
@@ -44,6 +48,8 @@ const FALLBACK: Record<string, string> = {
   "zhipuai-coding-plan": "Zhipu AI Coding Plan",
   "kimi-code-plan-global": "Kimi Code",
   "kimi-code-plan-cn": "Kimi Code (CN)",
+  "stepfun-ai-step-plan": "StepFun Step Plan",
+  "stepfun-step-plan": "StepFun Step Plan (CN)",
 }
 
 const WINDOW_ORDER = ["5h", "week", "month"]

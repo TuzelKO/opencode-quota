@@ -30,7 +30,14 @@ type Report = {
 }
 
 const GO = "opencode-go"
-const REMOTE = ["zai-coding-plan", "zhipuai-coding-plan", "kimi-code-plan-global", "kimi-code-plan-cn"]
+const REMOTE = [
+  "zai-coding-plan",
+  "zhipuai-coding-plan",
+  "kimi-code-plan-global",
+  "kimi-code-plan-cn",
+  "stepfun-ai-step-plan",
+  "stepfun-step-plan",
+]
 const KNOWN = [GO, ...REMOTE]
 const ORDER = ["5h", "week", "month"]
 
@@ -40,6 +47,8 @@ const NAMES: Record<string, string> = {
   "zhipuai-coding-plan": "Zhipu AI Coding Plan",
   "kimi-code-plan-global": "Kimi For Coding",
   "kimi-code-plan-cn": "Kimi For Coding (CN)",
+  "stepfun-ai-step-plan": "StepFun Step Plan",
+  "stepfun-step-plan": "StepFun Step Plan (CN)",
 }
 
 const SHORT: Record<string, string> = {
@@ -48,6 +57,8 @@ const SHORT: Record<string, string> = {
   "zhipuai-coding-plan": "Zhipu",
   "kimi-code-plan-global": "Kimi",
   "kimi-code-plan-cn": "Kimi CN",
+  "stepfun-ai-step-plan": "StepFun",
+  "stepfun-step-plan": "StepFun CN",
 }
 
 const LABELS: Record<string, string> = { "5h": "5h", week: "Week", month: "Month" }
