@@ -76,6 +76,7 @@ const css = `
 .q-head { display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px 12px; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .q-head:hover { background: var(--v2-overlay-simple-overlay-hover); }
 .q-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 530; }
+.q-plan { color: var(--v2-text-text-muted); font-weight: 400; }
 .q-pct { flex: none; color: var(--v2-text-text-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
 .q-body { display: flex; flex-direction: column; gap: 0; padding: 6px 12px 4px; }
 .q-window { display: flex; flex-direction: column; gap: 6px; padding: 8px 0; }
@@ -324,6 +325,8 @@ export default Plugin.define({
 
     const reportOf = (providerID: string) => (providerID === GO ? undefined : reports()[providerID])
 
+    const planOf = (providerID: string) => reportOf(providerID)?.plan
+
     const windowsFor = (session: MountedSession, providerID: string): Window[] =>
       providerID === GO ? goWindows(session) : reportOf(providerID)?.windows ?? []
 
@@ -436,7 +439,10 @@ export default Plugin.define({
                 <div class="q-item" data-open={open() ? "true" : "false"}>
                   <button class="q-head" aria-expanded={open()} onClick={() => setChosen(providerID)}>
                     <Ring percent={small()?.percent} size={16} loading={pendingFor(providerID)} />
-                    <span class="q-name">{nameOf(props.session, providerID)}</span>
+                    <span class="q-name">
+                      {nameOf(props.session, providerID)}
+                      <Show when={planOf(providerID)}>{(plan) => <span class="q-plan">{` | ${plan()}`}</span>}</Show>
+                    </span>
                     <span class="q-pct" style={{ color: toneColor(small()?.percent) }}>
                       {percentText(small()?.percent)}
                     </span>

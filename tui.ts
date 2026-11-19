@@ -263,9 +263,11 @@ export default {
             wrapMode: "none",
             get children() {
               const name = `${current() ? "●" : "○"} ${NAMES[props.providerID] ?? props.providerID}`
+              const plan = report()?.plan
+              const label = plan ? `${name} | ${plan}` : name
               const pct = percentText(small()?.percent)
-              const space = Math.max(1, props.width - name.length - pct.length - 3)
-              return name + " ".repeat(space) + pct
+              const space = Math.max(1, props.width - label.length - pct.length - 3)
+              return label + " ".repeat(space) + pct
             },
           },
         ),
