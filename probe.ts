@@ -140,11 +140,23 @@ export const stepfunProbe = (host: string): Probe => async (key) => {
 // Kimi Code publishes the used share per pool (`limit_5h`, `limit_7d`,
 // `limit_month_total`) next to the request-count windows. Each regional plan
 // has its own host; the same key answers on both, so the global one tries both.
+// The membership block left `/usages`, so the plan name comes from `/me`.
+const kimiPlan = async (usageUrl: string, key: string): Promise<string | undefined> => {
+  try {
+    const url = new URL("/coding/v1/me", usageUrl).toString()
+    const body = (await json(url, key)) as { user_level_name?: unknown }
+    return text(body?.user_level_name)
+  } catch {
+    return undefined
+  }
+}
+
 export const kimiProbe = (hosts: readonly string[]): Probe => async (key) => {
   let last: unknown
   for (const host of hosts) {
     try {
-      const body = (await json(host, key)) as Record<string, unknown>
+      const [response, profilePlan] = await Promise.all([json(host, key), kimiPlan(host, key)])
+      const body = response as Record<string, unknown>
       const usages = (body.usages ?? {}) as Record<string, unknown>
       const windows: Window[] = []
       const add = (id: string, raw: unknown) => {
@@ -184,7 +196,7 @@ export const kimiProbe = (hosts: readonly string[]): Probe => async (key) => {
       }
 
       const user = body.user as { membership?: { level?: unknown } } | undefined
-      return { windows, plan: text(user?.membership?.level) }
+      return { windows, plan: profilePlan ?? text(user?.membership?.level) }
     } catch (error) {
       last = error
     }
